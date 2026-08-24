@@ -28,7 +28,7 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, onCloseMobile }) => {
-  const { activeTab, setActiveTab, data, metrics } = useHotel();
+  const { activeTab, setActiveTab, data, metrics, logoutUser } = useHotel();
 
   interface NavItem {
     id: string;
@@ -278,6 +278,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, onCloseMobile })
                 {data.currentUser.role}
               </p>
             </div>
+            <button
+              onClick={logoutUser}
+              title="Log out (लॉग आउट)"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
           </div>
 
           <div className="px-1 space-y-1.5">

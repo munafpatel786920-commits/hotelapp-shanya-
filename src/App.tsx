@@ -19,10 +19,15 @@ import { ReportsView } from './components/reports/ReportsView';
 import { SettingsManagement } from './components/settings/SettingsManagement';
 import { InvoiceModal } from './components/billing/InvoiceModal';
 import { ReceiptModal } from './components/billing/ReceiptModal';
+import { LoginView } from './components/auth/LoginView';
 
 const MainContent: React.FC = () => {
-  const { activeTab } = useHotel();
+  const { activeTab, isAuthenticated } = useHotel();
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = React.useState(false);
+
+  if (!isAuthenticated) {
+    return <LoginView />;
+  }
 
   return (
     <div className="flex h-screen bg-slate-50 text-slate-800 font-sans antialiased overflow-hidden selection:bg-indigo-500/20 selection:text-indigo-900">

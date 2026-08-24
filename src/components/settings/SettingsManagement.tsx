@@ -469,15 +469,18 @@ export const SettingsManagement: React.FC = () => {
 
           {/* System Accounts Table */}
           <div className="space-y-3">
-            <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">Registered System Operator Accounts</h4>
+            <div className="flex items-center justify-between">
+              <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">Registered System Operator Accounts (लॉगिन विवरण)</h4>
+              <span className="text-[11px] text-slate-500 font-medium">Use these emails and passwords to sign in</span>
+            </div>
             <div className="overflow-x-auto border border-slate-200 rounded-2xl">
               <table className="w-full text-left text-xs">
                 <thead className="text-slate-500 border-b border-slate-200 bg-slate-50">
                   <tr>
                     <th className="p-3 font-semibold">User / Name</th>
-                    <th className="p-3 font-semibold">Username</th>
+                    <th className="p-3 font-semibold">Login Email ID</th>
                     <th className="p-3 font-semibold">Assigned Role</th>
-                    <th className="p-3 font-semibold">Access Clearance</th>
+                    <th className="p-3 font-semibold">Default Password</th>
                     <th className="p-3 font-semibold">Status</th>
                   </tr>
                 </thead>
@@ -485,17 +488,16 @@ export const SettingsManagement: React.FC = () => {
                   {data.users.map(u => (
                     <tr key={u.id} className="hover:bg-slate-50 transition-colors">
                       <td className="p-3 font-bold text-slate-900">{u.fullName}</td>
-                      <td className="p-3 font-mono text-indigo-600 font-semibold">{u.username}</td>
+                      <td className="p-3 font-mono text-indigo-600 font-semibold">{u.email || `${u.username}@alkareem.in`}</td>
                       <td className="p-3">
                         <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-100">
                           {u.role}
                         </span>
                       </td>
-                      <td className="p-3 text-slate-500">
-                        {u.role === 'Admin' ? 'Full Root Clearance (Financials, Staff, Settings)' :
-                         u.role === 'Manager' ? 'Full Operations & Booking Authorizations' :
-                         u.role === 'Receptionist' ? 'Front Desk, Check-In, Reservation Desk' :
-                         u.role === 'Accountant' ? 'Financials, Invoicing & Receipts' : 'Housekeeping Turnovers'}
+                      <td className="p-3">
+                        <span className="px-2 py-0.5 rounded font-mono text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                          {u.password || 'admin123'}
+                        </span>
                       </td>
                       <td className="p-3">
                         <span className="px-2 py-0.5 text-[10px] font-bold text-emerald-700 bg-emerald-50 rounded-full border border-emerald-200">

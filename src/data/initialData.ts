@@ -563,6 +563,7 @@ export const INITIAL_USERS: AppUser[] = [
     fullName: 'S PATEL (General Manager)',
     role: 'Admin',
     email: 's.patel@alkareem.in',
+    password: 'admin123',
     active: true,
     permissions: ['all']
   },
@@ -572,6 +573,7 @@ export const INITIAL_USERS: AppUser[] = [
     fullName: 'Sunita Deshmukh',
     role: 'Receptionist',
     email: 'sunita.d@alkareem.in',
+    password: 'reception123',
     active: true,
     permissions: ['rooms:view', 'rooms:edit', 'bookings:all', 'checkin:all', 'checkout:all', 'guests:all', 'billing:all']
   },
@@ -581,6 +583,7 @@ export const INITIAL_USERS: AppUser[] = [
     fullName: 'Pooja Patel',
     role: 'Accountant',
     email: 'pooja.patel@alkareem.in',
+    password: 'accounts123',
     active: true,
     permissions: ['billing:all', 'expenses:all', 'reports:all', 'dashboard:view']
   },
@@ -590,6 +593,7 @@ export const INITIAL_USERS: AppUser[] = [
     fullName: 'Ramesh Kumar',
     role: 'Housekeeping',
     email: 'ramesh.k@alkareem.in',
+    password: 'housekeeping123',
     active: true,
     permissions: ['housekeeping:all', 'rooms:view', 'rooms:status']
   },
@@ -599,6 +603,7 @@ export const INITIAL_USERS: AppUser[] = [
     fullName: 'Chef Manoj Verma',
     role: 'Restaurant Staff',
     email: 'chef.manoj@alkareem.in',
+    password: 'kitchen123',
     active: true,
     permissions: ['restaurant:all', 'rooms:view']
   },
@@ -608,6 +613,7 @@ export const INITIAL_USERS: AppUser[] = [
     fullName: 'Vikas Yadav',
     role: 'Manager',
     email: 'vikas.y@alkareem.in',
+    password: 'manager123',
     active: true,
     permissions: ['dashboard:view', 'rooms:all', 'bookings:all', 'staff:all', 'reports:all', 'expenses:all']
   }

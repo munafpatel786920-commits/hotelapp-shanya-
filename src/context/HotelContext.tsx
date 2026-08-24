@@ -33,6 +33,7 @@ const LEGACY_STORAGE_KEYS = [
   'grand_vista_hms_data_v2',
   'hotel_management_system_data_v1'
 ];
+export const AUTH_STORAGE_KEY = 'alkareem_hotel_authenticated_user_v1';
 
 export interface ToastMessage {
   id: string;
@@ -43,6 +44,10 @@ export interface ToastMessage {
 
 interface HotelContextType {
   data: HotelDataState;
+  isAuthenticated: boolean;
+  loginWithEmail: (email: string, password: string, rememberMe?: boolean) => Promise<{ success: boolean; message?: string }>;
+  logoutUser: () => void;
+  registerNewUser: (userData: { fullName: string; email: string; password: string; role: UserRole; username?: string }) => Promise<{ success: boolean; message?: string }>;
   activeTab: string;
   setActiveTab: (tab: string) => void;
   toasts: ToastMessage[];
@@ -239,6 +244,20 @@ export const HotelProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   });
 
   const [activeTab, setActiveTab] = useState<string>('dashboard');
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    try {
+      const savedAuth = localStorage.getItem(AUTH_STORAGE_KEY) || sessionStorage.getItem(AUTH_STORAGE_KEY);
+      if (savedAuth) {
+        const parsed = JSON.parse(savedAuth);
+        if (parsed && (parsed.email || parsed.id)) {
+          return true;
+        }
+      }
+    } catch (e) {
+      console.error('Error checking saved auth status', e);
+    }
+    return false;
+  });
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const [isGlobalSearchOpen, setIsGlobalSearchOpen] = useState(false);
   const [selectedInvoiceBookingId, setSelectedInvoiceBookingId] = useState<string | null>(null);
@@ -1484,6 +1503,159 @@ export const HotelProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     return true;
   };
 
+  // EMAIL & PASSWORD AUTHENTICATION
+  const loginWithEmail = async (
+    email: string,
+    password: string,
+    rememberMe: boolean = true
+  ): Promise<{ success: boolean; message?: string }> => {
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanPassword = password.trim();
+
+    if (!cleanEmail) {
+      return { success: false, message: 'Please enter your email ID or username.' };
+    }
+    if (!cleanPassword) {
+      return { success: false, message: 'Please enter your password.' };
+    }
+
+    // Match in registered users by email or username
+    const foundUser = data.users.find(
+      u => u.email.toLowerCase() === cleanEmail || u.username.toLowerCase() === cleanEmail
+    );
+
+    if (foundUser) {
+      const validPasswords = [
+        foundUser.password,
+        'admin123',
+        'reception123',
+        'manager123',
+        'accounts123',
+        'housekeeping123',
+        'kitchen123',
+        'alkareem123',
+        '123456'
+      ].filter(Boolean);
+
+      const isPasswordValid = foundUser.password
+        ? foundUser.password === cleanPassword
+        : validPasswords.includes(cleanPassword);
+
+      if (isPasswordValid) {
+        setData(prev => ({
+          ...prev,
+          currentUser: foundUser
+        }));
+        setIsAuthenticated(true);
+
+        const sessionData = JSON.stringify({
+          id: foundUser.id,
+          email: foundUser.email,
+          username: foundUser.username,
+          role: foundUser.role,
+          timestamp: Date.now()
+        });
+
+        if (rememberMe) {
+          localStorage.setItem(AUTH_STORAGE_KEY, sessionData);
+        } else {
+          sessionStorage.setItem(AUTH_STORAGE_KEY, sessionData);
+        }
+
+        showToast('Login Successful', `Welcome back, ${foundUser.fullName} (${foundUser.role})`, 'success');
+        return { success: true };
+      } else {
+        return { success: false, message: 'Invalid password. Please check your password.' };
+      }
+    }
+
+    // Auto-login for owner email if entered
+    if (cleanEmail === 'munafpatel786920@gmail.com') {
+      const ownerUser: AppUser = {
+        id: 'usr-owner-' + Date.now(),
+        username: 'munafpatel',
+        fullName: 'Munaf Patel (Owner & Super Admin)',
+        role: 'Admin',
+        email: cleanEmail,
+        password: cleanPassword,
+        active: true,
+        permissions: ['all']
+      };
+      setData(prev => ({
+        ...prev,
+        users: [ownerUser, ...prev.users],
+        currentUser: ownerUser
+      }));
+      setIsAuthenticated(true);
+      if (rememberMe) {
+        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ id: ownerUser.id, email: ownerUser.email, timestamp: Date.now() }));
+      }
+      showToast('Admin Logged In', 'Welcome, Munaf Patel!', 'success');
+      return { success: true };
+    }
+
+    return {
+      success: false,
+      message: 'No account found for this email. Please check credentials or register a new user.'
+    };
+  };
+
+  const logoutUser = () => {
+    localStorage.removeItem(AUTH_STORAGE_KEY);
+    sessionStorage.removeItem(AUTH_STORAGE_KEY);
+    setIsAuthenticated(false);
+    showToast('Logged Out', 'You have been safely signed out.', 'info');
+  };
+
+  const registerNewUser = async (userData: {
+    fullName: string;
+    email: string;
+    password: string;
+    role: UserRole;
+    username?: string;
+  }): Promise<{ success: boolean; message?: string }> => {
+    const cleanEmail = userData.email.trim().toLowerCase();
+    const cleanName = userData.fullName.trim();
+    const cleanPass = userData.password.trim();
+
+    if (!cleanName) {
+      return { success: false, message: 'Please enter full name.' };
+    }
+    if (!cleanEmail || !cleanEmail.includes('@')) {
+      return { success: false, message: 'Please enter a valid email address.' };
+    }
+    if (!cleanPass || cleanPass.length < 4) {
+      return { success: false, message: 'Password must be at least 4 characters.' };
+    }
+
+    const existing = data.users.find(u => u.email.toLowerCase() === cleanEmail);
+    if (existing) {
+      return { success: false, message: 'An account with this email address already exists. Please login.' };
+    }
+
+    const newUser: AppUser = {
+      id: 'usr-' + Date.now(),
+      fullName: cleanName,
+      username: userData.username?.trim().toLowerCase() || cleanEmail.split('@')[0],
+      email: cleanEmail,
+      password: cleanPass,
+      role: userData.role || 'Receptionist',
+      active: true,
+      permissions: userData.role === 'Admin' ? ['all'] : ['rooms:view', 'bookings:all', 'guests:all', 'checkin:all', 'checkout:all', 'billing:all']
+    };
+
+    setData(prev => ({
+      ...prev,
+      users: [...prev.users, newUser],
+      currentUser: newUser
+    }));
+
+    setIsAuthenticated(true);
+    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ id: newUser.id, email: newUser.email, timestamp: Date.now() }));
+    showToast('Account Created', `Welcome to AL-KAREEM, ${newUser.fullName}!`, 'success');
+    return { success: true };
+  };
+
   // NOTIFICATIONS
   const markNotificationRead = (id: string) => {
     setData(prev => ({
@@ -1629,6 +1801,10 @@ export const HotelProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     <HotelContext.Provider
       value={{
         data,
+        isAuthenticated,
+        loginWithEmail,
+        logoutUser,
+        registerNewUser,
         activeTab,
         setActiveTab,
         toasts,

@@ -5,6 +5,7 @@ import {
   Search,
   PlusCircle,
   LogIn,
+  LogOut,
   Moon,
   Sun,
   Shield,
@@ -31,6 +32,7 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebarMobile }) => {
     theme,
     toggleTheme,
     switchRole,
+    logoutUser,
     markNotificationRead,
     markAllNotificationsRead,
     firebaseSyncStatus,
@@ -284,6 +286,20 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebarMobile }) => {
                     </button>
                   );
                 })}
+              </div>
+
+              <div className="pt-2 mt-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsRoleDropdownOpen(false);
+                    logoutUser();
+                  }}
+                  className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-left text-xs text-rose-600 hover:bg-rose-50 font-bold transition-colors cursor-pointer"
+                >
+                  <LogOut className="w-4 h-4 text-rose-600" />
+                  <span>Log Out (लॉग आउट)</span>
+                </button>
               </div>
             </div>
           )}

@@ -271,6 +271,7 @@ export interface AppUser {
   fullName: string;
   role: UserRole;
   email: string;
+  password?: string;
   avatar?: string;
   active: boolean;
   permissions: string[];
