@@ -1,0 +1,15 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Hotel data collection
+    match /hotel_data/{documentId} {
+      allow read, write: if true;
+    }
+    
+    // Fallback for any other collections
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}

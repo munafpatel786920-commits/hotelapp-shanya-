@@ -1,0 +1,24 @@
+{
+  "$schema": "https://firebase.google.com/schemas/blueprint.json",
+  "entities": {
+    "HotelData": {
+      "collection": "hotel_data",
+      "fields": {
+        "rooms": { "type": "array", "description": "List of hotel rooms and status" },
+        "roomTypes": { "type": "array", "description": "List of room categories and rates" },
+        "guests": { "type": "array", "description": "Guest database" },
+        "bookings": { "type": "array", "description": "Reservation and booking entries" },
+        "payments": { "type": "array", "description": "Payment logs and receipts" },
+        "restaurantOrders": { "type": "array", "description": "F&B orders" },
+        "foodItems": { "type": "array", "description": "Menu items" },
+        "extraServices": { "type": "array", "description": "Extra amenities and services" },
+        "staff": { "type": "array", "description": "Staff roster and directory" },
+        "housekeeping": { "type": "array", "description": "Cleaning and room upkeep tasks" },
+        "expenses": { "type": "array", "description": "Operational expense logs" },
+        "settings": { "type": "object", "description": "Hotel profile and tax settings" },
+        "users": { "type": "array", "description": "System users and roles" },
+        "updatedAt": { "type": "string", "description": "Timestamp of last change" }
+      }
+    }
+  }
+}
